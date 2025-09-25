@@ -1,0 +1,17 @@
+FROM nginx:1.25-alpine
+
+# Copy all frontend files
+COPY ./ /usr/share/nginx/html
+
+# Create required Nginx directories with full permissions
+RUN mkdir -p /var/cache/nginx /var/run && \
+    chmod -R 777 /var/cache/nginx /var/run
+
+# Expose port 80
+EXPOSE 80
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s CMD wget --spider -q http://localhost:80/ || exit 1
+
+# Start Nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]
