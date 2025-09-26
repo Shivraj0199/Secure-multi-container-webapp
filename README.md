@@ -368,6 +368,9 @@ networks:
 
 ---
 
+
+![](https://github.com/Shivraj0199/Secure-multi-container-webapp/blob/main/Img/Screenshot%202025-09-25%20230055.png)
+
 ### Step 8: Verify the Setup
 
 1. docker ps
@@ -385,6 +388,8 @@ networks:
 1. http://ec2-public-ip/api
 
 ---
+
+![](https://github.com/Shivraj0199/Secure-multi-container-webapp/blob/main/Img/Screenshot%202025-09-25%20230123.png)
 
 ### Step 10: Test database connection:
 
