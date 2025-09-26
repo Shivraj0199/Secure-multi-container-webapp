@@ -288,4 +288,92 @@ server {
     }
 }
 ```
-### Step 5:
+### Step 5: MongoDB Password Secret
+
+* 5.1 Create ```secrets/mongo_root_password.txt```
+
+```echo "Strong@123" > /home/ec2-user/secure-multi-container-app/secrets/mongo_root_password.txt```
+
+### Step 6: Docker Compose Configuration
+
+* 6.1 Create ```multi-container/docker-compose.yml```
+
+```version: '3.8'
+
+services:
+  reverse-proxy:
+    image: nginx:1.25-alpine
+    container_name: nginx_proxy
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: secure_frontend
+    networks:
+      - app_network
+
+  backend:
+    build: ./backend
+    container_name: secure_backend
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://root:${MONGO_ROOT_PASSWORD}@mongo:27017/secureapp?authSource=admin
+    secrets:
+      - mongo_root_password
+    depends_on:
+      - mongo
+    networks:
+      - app_network
+
+  mongo:
+    image: mongo:6.0
+    container_name: secure_mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password
+    volumes:
+      - mongo_data:/data/db
+    secrets:
+      - mongo_root_password
+    networks:
+      - app_network
+
+secrets:
+  mongo_root_password:
+    file: ./secrets/mongo_root_password.txt
+
+volumes:
+  mongo_data:
+
+networks:
+  app_network:
+    driver: bridge
+```
+
+### Step 7: Build and Start the Containers
+
+1. docker-compose build
+2. docker-compose up -d
+
+### Step 8: Verify the Setup
+
+1. docker ps
+
+* **You should see something :**
+
+CONTAINER ID   IMAGE                 STATUS          PORTS
+abcd1234       nginx_reverse_proxy   Up 2 minutes    0.0.0.0:80->80/tcp
+efgh5678       frontend_container    Up 2 minutes
+ijkl9012       backend_container     Up 2 minutes
+mnop3456       mongo_container       Up 2 minutes
+
+### Step 8: 
