@@ -12,4 +12,19 @@ I used Docker secrets to manage sensitive database credentials, and volumes to p
 * Database (MongoDB) → Data persistence
 * Reverse Proxy (Nginx) → Routes traffic between frontend and backend
 
+### Step 1: Make sure you have installed all the dependencies (Install Docker & Docker-compose)
 
+1. sudo su
+2. sudo yum install docker.io
+3. curl -SL https://github.com/docker/compose/releases/download/v2.30.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+4. chmod +x /usr/local/bin/docker-compose
+5. docker-compose -v
+
+### Step 2: Create Project Folder Structure
+
+1. mkdir multi-container
+2. cd multi-container
+3. mkdir frontend, backend, nginx, secrets (inside the root folder multi-container)
+4. creates a docker-compose.yml file (inside the root folder multi-container)
+
+### Step 3: 
