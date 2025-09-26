@@ -7,11 +7,11 @@ I used Docker secrets to manage sensitive database credentials, and volumes to p
 
 ## Architecture :
 
-* Frontend (Nginx) → Serves the static website
-* Backend (Node.js) → REST API
-* Database (MongoDB) → Data persistence
-* Reverse Proxy (Nginx) → Routes traffic between frontend and backend
-
+* **Frontend (Nginx) → Serves the static website**
+* **Backend (Node.js) → REST API**
+* **Database (MongoDB) → Data persistence**
+* **Reverse Proxy (Nginx) → Routes traffic between frontend and backend**
+---
 ### Step 1: Make sure you have installed all the dependencies (Install Docker & Docker-compose)
 
 1. sudo su
@@ -19,17 +19,17 @@ I used Docker secrets to manage sensitive database credentials, and volumes to p
 3. curl -SL https://github.com/docker/compose/releases/download/v2.30.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
 4. chmod +x /usr/local/bin/docker-compose
 5. docker-compose -v
-
+---
 ### Step 2: Create Project Folder Structure
 
-1. mkdir multi-container
-2. cd multi-container
-3. mkdir frontend, backend, nginx, secrets (inside the root folder multi-container)
-4. creates a docker-compose.yml file (inside the root folder multi-container)
-
+1. mkdir **multi-container**
+2. cd **multi-container**
+3. mkdir **frontend, backend, nginx, secrets** (inside the root folder multi-container)
+4. creates a **docker-compose.yml file** (inside the root folder multi-container)
+---
 ### Step 3: Frontend Setup
 
-* 2.1 Create ```frontend/index.html```
+* **2.1 Create ```frontend/index.html```**
 
 ```
 <!DOCTYPE html>
@@ -160,7 +160,7 @@ I used Docker secrets to manage sensitive database credentials, and volumes to p
 </body>
 </html>
 ```
-* 2.2 Create ```frontend/dockerfile```
+* **2.2 Create ```frontend/dockerfile```**
 
 ```FROM nginx:1.25-alpine
 
@@ -180,10 +180,10 @@ HEALTHCHECK --interval=30s --timeout=10s CMD wget --spider -q http://localhost:8
 # Start Nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]
 ```
-
+---
 ### Step 3: Backend Setup
 
-* 3.1 Create ```backend/app.js```
+* **3.1 Create ```backend/app.js```**
 
 ```const express = require('express');
 const mongoose = require('mongoose');
@@ -208,7 +208,7 @@ app.listen(PORT, () => {
 });
 ```
 
-* 3.2 Create ```backend/package.json```
+* **3.2 Create ```backend/package.json```**
 
 ```{
   "name": "secure-backend",
@@ -224,7 +224,7 @@ app.listen(PORT, () => {
 }
 ```
 
-* 3.3 Create ```backend/dockerfile```
+* **3.3 Create ```backend/dockerfile```**
 
 ```FROM node:18-alpine
 
@@ -252,10 +252,10 @@ HEALTHCHECK --interval=30s --timeout=10s CMD wget --spider -q http://localhost:5
 
 CMD ["npm", "start"]
 ```
-
+---
 ### Step 4: Nginx Reverse Proxy
 
-4.1 Create ```nginx/default.conf```
+* **4.1 Create ```nginx/default.conf```**
 
 ```upstream frontend_service {
     server frontend:80;
@@ -290,13 +290,14 @@ server {
 ```
 ### Step 5: MongoDB Password Secret
 
-* 5.1 Create ```secrets/mongo_root_password.txt```
+* **5.1 Create ```secrets/mongo_root_password.txt```**
 
 ```echo "Strong@123" > /home/ec2-user/secure-multi-container-app/secrets/mongo_root_password.txt```
 
+---
 ### Step 6: Docker Compose Configuration
 
-* 6.1 Create ```multi-container/docker-compose.yml```
+* **6.1 Create ```multi-container/docker-compose.yml```**
 
 ```version: '3.8'
 
@@ -358,22 +359,34 @@ networks:
   app_network:
     driver: bridge
 ```
+---
 
 ### Step 7: Build and Start the Containers
 
 1. docker-compose build
 2. docker-compose up -d
 
+---
+
 ### Step 8: Verify the Setup
 
 1. docker ps
 
-* **You should see something :**
+---
 
-CONTAINER ID   IMAGE                 STATUS          PORTS
-abcd1234       nginx_reverse_proxy   Up 2 minutes    0.0.0.0:80->80/tcp
-efgh5678       frontend_container    Up 2 minutes
-ijkl9012       backend_container     Up 2 minutes
-mnop3456       mongo_container       Up 2 minutes
+### Step 9: Test the Application
 
-### Step 8: 
+* **Frontend:**
+
+1. http://ec2-public-ip
+
+* **Backend:**
+
+1. http://ec2-public-ip/api
+
+---
+
+### Step 10: Test database connection:
+
+* docker exec -it (mongodb-container-name) mongosh -u root -p (mongo-db-password)
+
